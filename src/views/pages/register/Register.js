@@ -274,118 +274,118 @@ const Register = () => {
 	
 	return (
 		<div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
-		<CContainer>
-			<CRow className="justify-content-center">
-			<CCol md={9} lg={7} xl={6}>
-				<CCard className="mx-4">
-				<CCardBody className="p-4">
-					<CForm onSubmit={handleSubmit}>
-					<h1>Register</h1>
-					{flashSuccess != '' && 
-						<p className="alert alert-success py-2">{flashSuccess}</p>
-					}
-					{flashError != '' && 
-						<p className="alert alert-danger py-2">{flashError}</p>
-					}
-					<p className="text-body-secondary">Create your account</p>
-					<CInputGroup className="mb-3">
-						<CInputGroupText>
-						<CIcon icon={cilUser} />
-						</CInputGroupText>
-						<CFormInput name="fullname" placeholder="Fullname" autoComplete="fullname" />
-						{fullnameError != null &&
-							<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
-							{fullnameError}
-							</small>
-						}
-					</CInputGroup>
-					<CInputGroup className="mb-3">
-						<CInputGroupText>
-						<CIcon icon={cilUser} />
-						</CInputGroupText>
-						<CFormInput name="username" placeholder="Username" autoComplete="username" />
-						{usernameError != null &&
-							<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
-							{usernameError}
-							</small>
-						}
-					</CInputGroup>
-					<CInputGroup className="mb-3">
-						<CInputGroupText>
-						<CIcon icon={cilUser} />
-						</CInputGroupText>
-						<CFormSelect name="gender" placeholder="Select gender" autoComplete="off">
-							<option value={""}>Select gender</option>
-							<option value={"M"}>Male</option>
-							<option value={"F"}>Female</option>
-						</CFormSelect>
-						{genderError != null &&
-							<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
-							{genderError}
-							</small>
-						}
-					</CInputGroup>
-					<CInputGroup className="mb-3">
-						<CInputGroupText>
-						<CIcon icon={cilPhone} />
-						</CInputGroupText>
-						<CFormInput name="phone" placeholder="Phone" autoComplete="phone" />
-						{phoneError != null &&
-							<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
-							{phoneError}
-							</small>
-						}
-					</CInputGroup>
-					<CInputGroup className="mb-3">
-						<CInputGroupText>@</CInputGroupText>
-						<CFormInput name="email" placeholder="Email" autoComplete="email" />
-						{emailError != null &&
-							<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
-							{emailError}
-							</small>
-						}
-					</CInputGroup>
-					<CInputGroup className="mb-3">
-						<CInputGroupText>
-						<CIcon icon={cilLockLocked} />
-						</CInputGroupText>
-						<CFormInput
-						type="password"
-						name="password"
-						placeholder="Password"
-						autoComplete="new-password"
-						/>
-						{passwordError != null &&
-							<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
-							{passwordError}
-							</small>
-						}
-					</CInputGroup>
-					<CInputGroup className="mb-4">
-						<CInputGroupText>
-						<CIcon icon={cilLockLocked} />
-						</CInputGroupText>
-						<CFormInput
-						type="password"
-						name="password1"
-						placeholder="Repeat password"
-						autoComplete="new-password"
-						/>
-						{passwordError1 != null &&
-							<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
-							{passwordError1}
-							</small>
-						}
-					</CInputGroup>
-					<div className="d-grid">
-						<CButton type="submit" color="success">Create Account</CButton>
-					</div>
-					</CForm>
-				</CCardBody>
-				</CCard>
-			</CCol>
-			</CRow>
-		</CContainer>
+			<CContainer>
+				<CRow className="justify-content-center">
+				<CCol md={9} lg={7} xl={6}>
+					<CCard className="mx-4">
+					<CCardBody className="p-4">
+						<CForm onSubmit={handleSubmit}>
+							<h1>Register</h1>
+							{flashSuccess != '' && 
+								<p className="alert alert-success py-2">{flashSuccess}</p>
+							}
+							{flashError != '' && 
+								<p className="alert alert-danger py-2">{flashError}</p>
+							}
+							<p className="text-body-secondary">Create your account</p>
+							<CInputGroup className="mb-3">
+								<CInputGroupText>
+								<CIcon icon={cilUser} />
+								</CInputGroupText>
+								<CFormInput name="fullname" placeholder="Fullname" autoComplete="fullname" />
+								{fullnameError != null &&
+									<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+									{fullnameError}
+									</small>
+								}
+							</CInputGroup>
+							<CInputGroup className="mb-3">
+								<CInputGroupText>
+								<CIcon icon={cilUser} />
+								</CInputGroupText>
+								<CFormInput name="username" placeholder="Username" autoComplete="username" />
+								{usernameError != null &&
+									<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+									{usernameError}
+									</small>
+								}
+							</CInputGroup>
+							<CInputGroup className="mb-3">
+								<CInputGroupText>
+								<CIcon icon={cilUser} />
+								</CInputGroupText>
+								<CFormSelect name="gender" placeholder="Select gender" autoComplete="off">
+									<option value={""}>Select gender</option>
+									<option value={"M"}>Male</option>
+									<option value={"F"}>Female</option>
+								</CFormSelect>
+								{genderError != null &&
+									<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+									{genderError}
+									</small>
+								}
+							</CInputGroup>
+							<CInputGroup className="mb-3">
+								<CInputGroupText>
+								<CIcon icon={cilPhone} />
+								</CInputGroupText>
+								<CFormInput name="phone" placeholder="Phone" autoComplete="phone" />
+								{phoneError != null &&
+									<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+									{phoneError}
+									</small>
+								}
+							</CInputGroup>
+							<CInputGroup className="mb-3">
+								<CInputGroupText>@</CInputGroupText>
+								<CFormInput name="email" placeholder="Email" autoComplete="email" />
+								{emailError != null &&
+									<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+									{emailError}
+									</small>
+								}
+							</CInputGroup>
+							<CInputGroup className="mb-3">
+								<CInputGroupText>
+								<CIcon icon={cilLockLocked} />
+								</CInputGroupText>
+								<CFormInput
+								type="password"
+								name="password"
+								placeholder="Password"
+								autoComplete="new-password"
+								/>
+								{passwordError != null &&
+									<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+									{passwordError}
+									</small>
+								}
+							</CInputGroup>
+							<CInputGroup className="mb-4">
+								<CInputGroupText>
+								<CIcon icon={cilLockLocked} />
+								</CInputGroupText>
+								<CFormInput
+								type="password"
+								name="password1"
+								placeholder="Repeat password"
+								autoComplete="new-password"
+								/>
+								{passwordError1 != null &&
+									<small style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+									{passwordError1}
+									</small>
+								}
+							</CInputGroup>
+							<div className="d-grid">
+								<CButton type="submit" color="primary">Create Account</CButton>
+							</div>
+						</CForm>
+					</CCardBody>
+					</CCard>
+				</CCol>
+				</CRow>
+			</CContainer>
 		</div>
 	)
 }
