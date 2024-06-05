@@ -101,11 +101,13 @@ const AddDataProduct = () => {
         event.preventDefault();
 
         const formData = new FormData(event.target)
-		const is_active = formData.get('is_active') == "on" ? "Y" : "N";
         
+		const pos = formData.get('pos') == "on" ? "Y" : "N";
+		const is_active = formData.get('is_active') == "on" ? "Y" : "N";
         try {
             const dataParams = ({
                 ...dataForm,
+                pos: pos,
                 is_active: is_active,
                 username: localStorage.getItem('username')
             })
@@ -168,7 +170,7 @@ const AddDataProduct = () => {
         if(isSuccessCreate) {
             addToast(notifications)
             setTimeout(() => {
-                // navigate('/page/master/products')
+                navigate('/page/master/products')
             }, 3500);
         }
     }, [isSuccessCreate]);
@@ -186,7 +188,7 @@ const AddDataProduct = () => {
                 <CRow>
                     <CCol md={8}>
                         <CRow>
-                            <CCol className='mb-3' md={9}>
+                            <CCol className='mb-3' md={8}>
                                 <CFormInput
                                     type="text"
                                     name="name"
@@ -200,13 +202,23 @@ const AddDataProduct = () => {
                                     </small>
                                 }
                             </CCol>
-                            <CCol md={3}>
+                            <CCol md={2}>
                                 <div className="mb-3">
                                     <CFormLabel htmlFor="is_active">Status</CFormLabel>
                                     <CFormCheck 
                                         id="is_active" 
                                         name='is_active' 
                                         label={Language().lang == 'id' ? 'Aktif ?' : 'Active ?'}
+                                        defaultChecked/>
+                                </div>
+                            </CCol>
+                            <CCol md={2}>
+                                <div className="mb-3">
+                                    <CFormLabel htmlFor="pos">POS</CFormLabel>
+                                    <CFormCheck 
+                                        id="pos" 
+                                        name='pos' 
+                                        label={Language().lang == 'id' ? 'Ya ?' : 'Yes ?'}
                                         defaultChecked/>
                                 </div>
                             </CCol>
