@@ -1,8 +1,10 @@
+
 import axios from "axios";
 
-const BASE_URL = 'http://127.0.0.1:3001/'
+const BASE_URL = process.env.BASE_URL
 
 const getProfile = async () => {
+  
     const headers = { Authorization: localStorage.getItem('token') };
     return await axios
       .get(BASE_URL + "api/user/current", { headers })

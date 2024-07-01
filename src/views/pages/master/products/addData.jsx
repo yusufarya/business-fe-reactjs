@@ -1,22 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CRow, CToast, CToastBody, CToastHeader, CToaster} from "@coreui/react";
+import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CToast, CToastBody, CToastHeader, CToaster} from "@coreui/react";
 import Language from "../../../../utils/language";
 import CIcon from "@coreui/icons-react";
 import AppService from "../../../../services/AppService";
-import { cilCheckCircle, cilXCircle } from '@coreui/icons';
+import { cilCheckCircle, cilPencil, cilPlus, cilTrash, cilX, cilXCircle } from '@coreui/icons';
 import { useNavigate } from 'react-router-dom';
 import { isEmpty } from 'lodash';
+import FormaterHelper from '../../../../utils/fotmaterHelper';
+import { useSelector } from 'react-redux';
+import ConversionTable from './conversion_unit/conversionUnitTable';
 
 const AddDataProduct = () => {
+    const dataUser = useSelector((state) => state.dataUser);
     const navigate = useNavigate()
 
     const [dataForm, setDataForm] = useState(null)
     const [unitData, setUnitData] = useState(null)
+    const [conversionUnitData, setConversionUnitData] = useState([]);
     const [categoryData, setCategoryData] = useState(null)
     const [brandData, setBrandData] = useState(null)
     const [imagePreview, setImagePreview] = useState(null);
     const [isSuccessCreate, setIsSuccessCreate] = useState(null)
     const [validationError, setValidationError] = useState([])
+    const [idProduct, setIdProduct] = useState(null)
+    const [isMultipleUnit, setIsMultipleUnit] = useState(false)
+    const [addRowConversion, setAddRowConversion] = useState(false)
     
     useEffect(() => {
         const getDataCategory = async () => {
@@ -91,34 +99,64 @@ const AddDataProduct = () => {
 
     const handleInput = (e) => {
         const {name, value} = e.target
-        setDataForm({
-            ...dataForm,
-            [name]: value
-        })
+        if (name === 'purchase_price' || name === 'selling_price') {
+            setDataForm({
+                ...dataForm,
+                [name]: FormaterHelper.formatRupiah(value),
+            })
+        } else {
+            setDataForm({
+                ...dataForm,
+                [name]: value,
+            })
+        }
+    }
+
+    const handleMultiUnit = (e) => {
+        const {name, value} = e.target
+        setIsMultipleUnit(value === "Y");
+        handleSubmit()
     }
 
     const handleSubmit = async(event) => {
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
 
-        const formData = new FormData(event.target)
+        const formData = new FormData(event?.target);
+        const purchase_price = dataForm.purchase_price ? dataForm.purchase_price : 0;
+        const selling_price = dataForm.selling_price ? dataForm.selling_price : 0;
+        const pos = formData.get('pos') === "on" ? "Y" : "N";
+        const is_active = formData.get('is_active') === "on" ? "Y" : "N";
         
-		const pos = formData.get('pos') == "on" ? "Y" : "N";
-		const is_active = formData.get('is_active') == "on" ? "Y" : "N";
         try {
             const dataParams = ({
                 ...dataForm,
+                purchase_price: FormaterHelper.stripRupiahFormatting(purchase_price),
+                selling_price: FormaterHelper.stripRupiahFormatting(selling_price),
                 pos: pos,
                 is_active: is_active,
-                username: localStorage.getItem('username')
+                username: dataUser.username
             })
             console.log(" === dataParams === ")
             console.log(dataParams)
+
+            let response = null
+
+            if(idProduct == null) {
+                response = await AppService.ServicePost('api/product/create', dataParams);
+            } else {
+                dataParams.id = idProduct
+                response = await AppService.ServicePatch('api/product/update', dataParams);
+                setIsMultipleUnit(false)
+            }
             
             // Send a POST request to upload the image using AppService
-            const response = await AppService.ServicePost('api/product/create', dataParams);
+            console.log(response)
             if(response.statusCode == 200) {
                 console.log(response.message)
-                setIsSuccessCreate({'status':'success', 'message': response.message.data})
+                setIdProduct(response.data.id)
+                setIsSuccessCreate({'status':'success', 'message': response.message})
             } else {
                 if(!isEmpty(response.errorData.error)) {
 					setValidationError(response.errorData.error.issues)
@@ -139,9 +177,6 @@ const AddDataProduct = () => {
 		? errors.find(error => error.path.includes(attr)).message
 		: null;
 	};
-
-    // console.log("=== isSuccessCreate ===")
-    // console.log(isSuccessCreate)
 
     const [toast, addToast] = useState(0)
     const toaster = useRef()
@@ -165,16 +200,36 @@ const AddDataProduct = () => {
             </CToastBody>
         </CToast>
     )
-
-    useEffect(() => {
-        if(isSuccessCreate) {
-            addToast(notifications)
-            setTimeout(() => {
-                navigate('/page/master/products')
-            }, 3500);
-        }
-    }, [isSuccessCreate]);
     
+    useEffect(() => {
+        
+        addToast(notifications)
+        if(isSuccessCreate?.status == 'success') {
+            
+            if(isMultipleUnit) {
+                const conversionUnitsResponse = async () => {
+                    try {
+                        const result = await AppService.serviceGet('api/conversion-unit/get-by-product', {product_id: idProduct})
+                        setConversionUnitData(result.data);
+                    } catch (error) {
+                        console.error('Error fetching data:', error);
+                    }
+                }
+                conversionUnitsResponse()
+            }
+            
+            setTimeout(() => {
+                if(!isMultipleUnit) {
+                    navigate('/page/master/products')
+                }
+            }, 3500);
+        } else {
+            setIsMultipleUnit(false)
+        }
+
+    }, [isSuccessCreate]);
+
+
     return (
         <div>
             <CRow>
@@ -291,7 +346,7 @@ const AddDataProduct = () => {
                                     type='number'
                                     name="min_stock"
                                     id="min_stock"
-                                    label={'Min Stock'}
+                                    label={'Min '+ Language().LABEL_STOCK}
                                     onChange={(e) => handleInput(e)}
                                 />
                                 {getFormError(validationError, 'min_stock') != null &&
@@ -305,7 +360,7 @@ const AddDataProduct = () => {
                                     type='number'
                                     name="max_stock"
                                     id="max_stock"
-                                    label={'Max Stock'}
+                                    label={'Max '+ Language().LABEL_STOCK}
                                     onChange={(e) => handleInput(e)}
                                 />
                                 {getFormError(validationError, 'max_stock') != null &&
@@ -319,8 +374,9 @@ const AddDataProduct = () => {
                                     type='text'
                                     name="purchase_price"
                                     id="purchase_price"
-                                    label={'Purchase Price'}
-                                    onChange={(e) => handleInput(e)}
+                                    value={dataForm?.purchase_price ?? 0}
+                                    label={Language().LABEL_PURCHASE_PRICE}
+                                    onChange={(e) => handleInput(e)} onKeyUp={(e) => handleInput(e)}
                                 />
                                 {getFormError(validationError, 'purchase_price') != null &&
                                     <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
@@ -333,8 +389,9 @@ const AddDataProduct = () => {
                                     type='text'
                                     name="selling_price"
                                     id="selling_price"
-                                    label={'Selling Price'}
-                                    onChange={(e) => handleInput(e)}
+                                    value={dataForm?.selling_price ?? 0}
+                                    label={Language().LABEL_SELLING_PRICE}
+                                    onChange={(e) => handleInput(e)} onKeyUp={(e) => handleInput(e)}
                                 />
                                 {getFormError(validationError, 'selling_price') != null &&
                                     <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
@@ -351,36 +408,54 @@ const AddDataProduct = () => {
                                     onChange={(e) => handleInput(e)}
                                 />
                             </CCol>
+
+                            <ConversionTable conversionUnitData={conversionUnitData} unitData={unitData} idProduct={idProduct} setIsMultipleUnit={setIsMultipleUnit} setIsSuccessCreate={setIsSuccessCreate}/>
+                        </CRow>
+                    </CCol>
+                        
+                    <CCol md={4}>
+                        <CRow>
+
+                            <CCol md={12}>
+                                <label className='mb-2'>{Language().LABEL_IMAGE}</label>
+                                {/* <div id='preview-img' style={{height: '300px', background: '#eaeaea'}}> */}
+                                <div id='preview-img' style={{ 
+                                    height: '300px', 
+                                    background: '#fafafa',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }}>
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="Preview" style={{ 
+                                            maxWidth: 'auto', 
+                                            height: '97%', 
+                                            objectFit: 'contain' 
+                                        }} />
+                                    ) : (
+                                        <p style={{padding: '10px', color: '#acacac'}}>No image selected</p>
+                                    )}
+                                </div>
+                                <CFormInput 
+                                    className='mt-3'
+                                    type='file'
+                                    name='image'
+                                    accept="image/*"
+                                    onChange={(e) => handleInputImage(e)}
+                                />
+                            </CCol>
+                            
+                            <CCol md={5}>
+                                <label className='mb-2 mt-4 pt-3'>{Language().lang == 'id' ? 'Tambah Multi Satuan' : 'Add Multiple Unit'}</label>
+                            </CCol>
+                            <CCol md={5} className='pt-2'>
+                                <CFormSelect name='multiple_unit' className='mb-2 mt-4' value={isMultipleUnit ? 'Y' : 'N'} onChange={handleMultiUnit} disabled={isMultipleUnit == 'Y'}>
+                                    <option value={'Y'}> {Language().lang == 'id' ? 'Ya' : 'Yes'} </option>
+                                    <option value={'N'}> {Language().lang == 'id' ? 'Tidak' : 'No'} </option>
+                                </CFormSelect>
+                            </CCol>
                         </CRow>
                         
-                    </CCol>
-                    <CCol md={4}>
-                        <label className='mb-2'>{Language().LABEL_IMAGE}</label>
-                        {/* <div id='preview-img' style={{height: '300px', background: '#eaeaea'}}> */}
-                        <div id='preview-img' style={{ 
-                            height: '300px', 
-                            background: '#fafafa',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                         }}>
-                            {imagePreview ? (
-                                <img src={imagePreview} alt="Preview" style={{ 
-                                    maxWidth: 'auto', 
-                                    height: '97%', 
-                                    objectFit: 'contain' 
-                                }} />
-                            ) : (
-                                <p style={{padding: '10px', color: '#acacac'}}>No image selected</p>
-                            )}
-                        </div>
-                        <CFormInput 
-                            className='mt-3'
-                            type='file'
-                            name='image'
-                            accept="image/*"
-                            onChange={(e) => handleInputImage(e)}
-                        />
                     </CCol>
                 </CRow>
 

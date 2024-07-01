@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CFormTextarea, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react';
 import AppService from '../../../../../services/AppService';
 import Language from '../../../../../utils/language';
+import { useSelector } from 'react-redux';
 
 const ModalEditData = ({ status, onModalStatusChange, stockAdjustmentDetailId, successUpdate }) => {
-	
+	const dataUser = useSelector((state) => state.dataUser);
+
 	const [visible, setVisible] = useState(false);
 	const [fixDataStockAdjustmentDetail, setFixDataStockAdjustmentDetail] = useState(null)
 	const [stockAdjustmentDetailDetail, setStockAdjustmentDetailDetail] = useState(null)
@@ -54,6 +56,7 @@ const ModalEditData = ({ status, onModalStatusChange, stockAdjustmentDetailId, s
             id:fixDataStockAdjustmentDetail.id,
             qty: qty,
             qty_current: fixDataStockAdjustmentDetail.qty,
+			username: dataUser.username
         }
         console.log(stockAdjustmentDetailData)
 

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormTextarea, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react';
 import AppService from '../../../../services/AppService';
+import { useSelector } from 'react-redux';
 
 const ModalEditData = ({ status, onModalStatusChange, unitId, successUpdate }) => {
+	const dataUser = useSelector((state) => state.dataUser);
+
 	const [visible, setVisible] = useState(false);
 	const [fixDataUnit, setFixDataUnit] = useState(null)
 	const [unitDetail, setUnitDetail] = useState(null)
@@ -51,16 +54,17 @@ const ModalEditData = ({ status, onModalStatusChange, unitId, successUpdate }) =
 			name: name,
 			description: description,
 			is_active: is_active,
-			username: localStorage.getItem('username')
+			username: dataUser.username
 		}
 
 		try {
 			const response = await AppService.ServicePatch('api/unit/update', unitData)
 			console.log(response)
 			if(response.statusCode == 200) {
-				successUpdate({'status':'success', 'message': response.message.data})
+				successUpdate({'status':'success', 'message': response.message})
 			} else {
-				successUpdate({'status':'failed', 'message': response.errorData.errors})
+                successUpdate({'status':'failed', 'message': 'Please check the form input.'})
+				// successUpdate({'status':'failed', 'message': response.errorData.errors})
 			}
 			handleClose()
 		} catch (error) {
@@ -69,7 +73,7 @@ const ModalEditData = ({ status, onModalStatusChange, unitId, successUpdate }) =
 		}
 
 	}
-	console.log(unitDetail.is_active)
+	
 	return (
 		<>
 		<CModal
@@ -106,7 +110,7 @@ const ModalEditData = ({ status, onModalStatusChange, unitId, successUpdate }) =
 					</div>
 					<div className="mb-3">
 						<CFormLabel htmlFor="description">Description</CFormLabel>
-						<CFormTextarea name="description" id="description" rows={2} value={unitDetail.description} onChange={handleDescriptionChange}></CFormTextarea>
+						<CFormTextarea name="description" id="description" rows={2} value={unitDetail.description ?? ''} onChange={handleDescriptionChange}></CFormTextarea>
 					</div>
 
 					</>

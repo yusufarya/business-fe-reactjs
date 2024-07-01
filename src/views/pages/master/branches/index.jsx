@@ -99,7 +99,9 @@ const Index = () => {
     return (
         <div>
             <CRow>
-                <CCol className="mb-3"></CCol>
+                <CCol className="mb-3">
+                    {Language().MENU_NAME_BRANCH}
+                </CCol>
                 <CCol md={3} className="mb-3">
                     <CButton color="primary" style={{float:'right'}} onClick={handleAddClick}>{Language().LABEL_ADD}</CButton>
                 </CCol>
@@ -131,7 +133,7 @@ const Index = () => {
                             branchData != null &&
                             branchData.map((branch, index) => (
                                 <CTableRow key={branch.id}>
-                                    <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
+                                    <CTableDataCell>{index+1}</CTableDataCell>
                                     <CTableDataCell>{branch.name}</CTableDataCell>
                                     <CTableDataCell>{branch.phone}</CTableDataCell>
                                     <CTableDataCell>{branch.address}</CTableDataCell>

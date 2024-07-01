@@ -15,6 +15,8 @@ const Language = function() {
     let LABEL_TYPE;
     let LABEL_STOCK;
     let LABEL_QTY;
+    let LABEL_PURCHASE_PRICE;
+    let LABEL_SELLING_PRICE;
     
     let LABEL_UNIT;
     let LABEL_BRAND;
@@ -43,7 +45,7 @@ const Language = function() {
 
     if (lang === 'id') {
         LABEL_LANG = 'Bahasa';
-        UNAUTHORIZED = 'Anda Belum Login';
+        UNAUTHORIZED = 'Anda belum login, silahkan login terlebuh dahulu.';
         
         LABEL_NUMBER = 'Nomor';
         LABEL_NAME = 'Nama';
@@ -57,6 +59,8 @@ const Language = function() {
         LABEL_TYPE = 'Tipe';
         LABEL_STOCK = 'Stok';
         LABEL_QTY = 'Qty';
+        LABEL_PURCHASE_PRICE = 'Harga Beli';
+        LABEL_SELLING_PRICE = 'Harga Jual';
 
         LABEL_ADD = 'Tambah Data';
         LABEL_EDIT = 'Ubah Data';
@@ -97,6 +101,8 @@ const Language = function() {
         LABEL_TYPE = 'Type';
         LABEL_STOCK = 'Stock';
         LABEL_QTY = 'Qty';
+        LABEL_PURCHASE_PRICE = 'Purchase Price';
+        LABEL_SELLING_PRICE = 'Selling Price';
 
         LABEL_ADD = 'Add Data';
         LABEL_EDIT = 'Edit Data';
@@ -140,6 +146,8 @@ const Language = function() {
         LABEL_TYPE,
         LABEL_STOCK,
         LABEL_QTY,
+        LABEL_PURCHASE_PRICE,
+        LABEL_SELLING_PRICE,
 
         LABEL_ADD,
         LABEL_EDIT,

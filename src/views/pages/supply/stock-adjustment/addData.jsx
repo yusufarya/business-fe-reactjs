@@ -4,8 +4,11 @@ import Language from "../../../../utils/language";
 import CIcon from "@coreui/icons-react";
 import { cibAddthis } from "@coreui/icons";
 import AppService from "../../../../services/AppService";
+import { useSelector } from 'react-redux';
 
 const AddDataStockAdjustment = () => {
+    const dataUser = useSelector((state) => state.dataUser);
+
     const [visibleAddItem, setVisibleAddItem] = useState(false);
     const [visibleAddDetail, setVisibleAddDetail] = useState(true);
     const [visibleSubmit, setVisibleSubmit] = useState(false);
@@ -31,7 +34,8 @@ const AddDataStockAdjustment = () => {
         e.preventDefault();
         const paramsHeader = {
             ...dataHeader,
-            branch_id: localStorage.getItem('currentBranch')
+            branch_id: localStorage.getItem('currentBranch'),
+            username: dataUser.username
         };
 
         try {

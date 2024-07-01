@@ -99,7 +99,9 @@ const Index = () => {
     return (
         <div>
         <CRow>
-            <CCol className="mb-3"></CCol>
+            <CCol className="mb-3">
+                {Language().MENU_NAME_UNIT}
+            </CCol>
             <CCol md={3} className="mb-3">
                 <CButton color="primary" style={{float:'right'}} onClick={handleAddClick}>{Language().LABEL_ADD}</CButton>
             </CCol>
@@ -129,7 +131,7 @@ const Index = () => {
                         unitData != null &&
                         unitData.map((unit, index) => (
                             <CTableRow key={unit.id}>
-                                <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
+                                <CTableDataCell>{index+1}</CTableDataCell>
                                 <CTableDataCell>{unit.initial}</CTableDataCell>
                                 <CTableDataCell>{unit.name}</CTableDataCell>
                                 <CTableDataCell>{unit.description}</CTableDataCell>

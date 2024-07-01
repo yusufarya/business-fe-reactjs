@@ -1,12 +1,13 @@
 // src/components/PageDisabled.js
 import React from 'react';
+import Language from '../utils/language';
 
 const PageDisabled = ({message}) => {
     return (
         <div style={overlayStyle}>
             <div style={messageStyle}>
-                <h1>Sorry</h1>
-                <p>{message}.</p>
+                <h1 style={{fontSize: '26px !important', fontWeight: '600'}}>{Language().lang == 'id' ? 'Maaf': 'Sorry'}</h1>
+                <p style={{fontSize: '16px !important'}}>{message}.</p>
             </div>
         </div>
     );

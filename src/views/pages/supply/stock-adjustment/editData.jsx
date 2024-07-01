@@ -8,8 +8,10 @@ import { cilPencil, cilTrash } from "@coreui/icons";
 import ModalAddData from "./detail/add";
 import ModalEditData from "./detail/edit";
 import ModalDelete from "./detail/delete";
+import { useSelector } from "react-redux";
 
 const EditDataStockAdjustment = () => {
+    const dataUser = useSelector((state) => state.dataUser);
     let { number } = useParams();
     
     const [visibleAddItem, setVisibleAddItem] = useState(false);

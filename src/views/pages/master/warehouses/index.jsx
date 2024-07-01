@@ -136,7 +136,7 @@ const Index = () => {
                             warehouseData != null &&
                             warehouseData.map((warehouse, index) => (
                                 <CTableRow key={warehouse.id}>
-                                    <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
+                                    <CTableDataCell>{index+1}</CTableDataCell>
                                     <CTableDataCell>{warehouse.name}</CTableDataCell>
                                     {/* <CTableDataCell>{warehouse.branch.name}</CTableDataCell> */}
                                     <CTableDataCell>{warehouse.phone}</CTableDataCell>

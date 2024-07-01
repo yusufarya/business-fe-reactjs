@@ -12,3 +12,44 @@
 
 // If you want to add custom CSS you can put it here
 @import "custom";
+
+// Define the font-face
+@font-face {
+    font-family: 'Monserrant';
+    src: url('../../public/font/Montserrat/Montserrat-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: "Monserrant";
+    font-size: 14px;
+}
+
+.custom-sidebar {
+    // background-color: rgb(255, 255, 255);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px #f5ffff;
+    width: 16.5rem;
+}
+.sidebar-nav .nav-group.show .nav-group-toggle {
+    background-color: rgba(0, 34, 255, 0.176) !important;
+    color: rgb(0, 34, 255) !important;
+}
+.sidebar-nav .nav-group.show .nav-group-toggle .nav-icon {
+    color: rgb(0, 34, 255) !important;
+}
+.sidebar-nav .nav-link.active {
+    background-color: rgba(0, 4, 255, 0.065) !important;
+}
+
+.custom-topbar {
+    // background-color: rgb(255, 255, 255);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px #f5ffff;
+}
+
+.brand-name strong {
+    font-size: 28px;
+    font-weight: 700;
+}

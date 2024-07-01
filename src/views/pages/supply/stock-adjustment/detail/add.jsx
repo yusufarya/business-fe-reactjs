@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CFormTextarea, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react';
 import AppService from '../../../../../services/AppService';
 import Language from '../../../../../utils/language';
+import { useSelector } from 'react-redux';
 
 const ModalAddData = ({ status, onModalStatusChange, successUpdate}) => {
+    const dataUser = useSelector((state) => state.dataUser);
+
     const [visible, setVisible] = useState(false);
     const [warehouseDataAdd, setWarehouseDataAdd] = useState(null);
     const [allBranchData, setAllBranchData] = useState(null)
@@ -38,7 +41,7 @@ const ModalAddData = ({ status, onModalStatusChange, successUpdate}) => {
 		const is_active = formData.get('is_active') == "on" ? "Y" : "N";
 
         console.log("=== SUBMIT ===")
-        const warehouseData = {...warehouseDataAdd, is_active: is_active}
+        const warehouseData = {...warehouseDataAdd, is_active: is_active, username: dataUser.username}
 
         try {
 			const response = await AppService.ServicePost('api/warehouse/create', warehouseData)

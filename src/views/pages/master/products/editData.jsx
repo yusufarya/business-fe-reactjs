@@ -1,32 +1,41 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CRow, CToast, CToastBody, CToastHeader, CToaster } from "@coreui/react";
+import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CToast, CToastBody, CToastHeader, CToaster } from "@coreui/react";
 import Language from "../../../../utils/language";
 import CIcon from "@coreui/icons-react";
 import AppService from "../../../../services/AppService";
 import { cilCheckCircle, cilXCircle } from '@coreui/icons';
 import { useNavigate, useParams } from 'react-router-dom';
+import FormaterHelper from '../../../../utils/fotmaterHelper';
+import ConversionTable from './conversion_unit/conversionUnitTable';
+import { useSelector } from 'react-redux';
 
 const AddDataProduct = () => {
+    const dataUser = useSelector((state) => state.dataUser);
     const navigate = useNavigate();
     const { id } = useParams();
+    const idProduct = id
 
     const [dataForm, setDataForm] = useState({});
     const [detailProduct, setDetailProduct] = useState(null);
     const [unitData, setUnitData] = useState([]);
+    const [conversionUnitData, setConversionUnitData] = useState([]);
     const [categoryData, setCategoryData] = useState([]);
     const [brandData, setBrandData] = useState([]);
     const [imagePreview, setImagePreview] = useState(null);
     const [isSuccessCreate, setIsSuccessCreate] = useState(null);
+    const [validationError, setValidationError] = useState([])
     const [barcode, setBarcode] = useState('');
+    const [isMultipleUnit, setIsMultipleUnit] = useState(false)
 
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
-                const [productResponse, categoryResponse, brandResponse, unitResponse] = await Promise.all([
+                const [productResponse, categoryResponse, brandResponse, unitResponse, conversionUnitsResponse] = await Promise.all([
                     AppService.serviceGet('api/product/get', { id }),
                     AppService.serviceGet('api/all-category'),
                     AppService.serviceGet('api/all-brand'),
                     AppService.serviceGet('api/all-unit'),
+                    AppService.serviceGet('api/conversion-unit/get-by-product', {product_id:idProduct}),
                 ]);
 
                 if (productResponse.data) {
@@ -36,13 +45,17 @@ const AddDataProduct = () => {
                 setCategoryData(categoryResponse.data);
                 setBrandData(brandResponse.data);
                 setUnitData(unitResponse.data);
+                if(conversionUnitsResponse.data.length > 0) {
+                    setIsMultipleUnit('Y')
+                }
+                setConversionUnitData(conversionUnitsResponse.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
 
         fetchInitialData();
-    }, [id]);
+    }, [idProduct]);
 
     const handleInputImage = async (e) => {
         const file = e.target.files[0];
@@ -77,11 +90,24 @@ const AddDataProduct = () => {
 
     const handleInput = (e) => {
         const { name, value } = e.target;
-        setDetailProduct((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        if (name === 'purchase_price' || name === 'selling_price') {
+            setDetailProduct((prevData) => ({
+                ...prevData,
+                [name]: FormaterHelper.formatRupiah(value),
+            }));
+        } else {
+            setDetailProduct((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
     };
+
+    const handleMultiUnit = (e) => {
+        const {name, value} = e.target
+        setIsMultipleUnit(value === "Y");
+        handleSubmit()
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -91,19 +117,19 @@ const AddDataProduct = () => {
         const pos = formData.get('pos') === "on" ? "Y" : "N";
 
         const paramsDataUpdate = {
-            id: id,
+            id: idProduct,
             name: detailProduct.name,
             category_id: detailProduct.category_id,
             brand_id: detailProduct.brand_id,
             unit_id: detailProduct.unit_id,
             min_stock: detailProduct.min_stock,
             max_stock: detailProduct.max_stock,
-            purchase_price: detailProduct.purchase_price,
-            selling_price: detailProduct.selling_price,
+            purchase_price: FormaterHelper.stripRupiahFormatting(detailProduct.purchase_price),
+            selling_price: FormaterHelper.stripRupiahFormatting(detailProduct.selling_price),
             image: dataForm.image,  // Ensure image is included
             is_active: is_active,
             pos: pos,
-            username: localStorage.getItem('username'),
+            username: dataUser.username
         };
 
         if(detailProduct.description) {
@@ -115,14 +141,26 @@ const AddDataProduct = () => {
 
         try {
             const response = await AppService.ServicePatch('api/product/update', paramsDataUpdate);
+            console.log(response)
             if (response.statusCode === 200) {
-                setIsSuccessCreate({ status: 'success', message: response.message.data });
+                setIsSuccessCreate({ status: 'success', message: response.message });
             } else {
-                setIsSuccessCreate({ status: 'failed', message: response.errorData.errors });
+                if(!isEmpty(response.errorData.error)) {
+					setValidationError(response.errorData.error.issues)
+				}
+                setIsSuccessCreate({'status':'failed', 'message': 'Please check the form input.'})
+                // setIsSuccessCreate({ status: 'failed', message: response.errorData.errors });
             }
         } catch (error) {
             console.error('Error updating product:', error);
         }
+    };
+    
+    // Assuming errors is the array of error objects you provided
+    const getFormError = (errors, attr) => {
+        return errors.some(error => error.path.includes(attr)) 
+        ? errors.find(error => error.path.includes(attr)).message
+        : null;
     };
 
     const [toast, addToast] = useState(0);
@@ -148,16 +186,27 @@ const AddDataProduct = () => {
     );
 
     useEffect(() => {
-        if (isSuccessCreate) {
-            addToast(notifications);
-
-            if (isSuccessCreate.status === 'success') {
-                setTimeout(() => {
-                    navigate('/page/master/products');
-                }, 3000);
+        addToast(notifications);
+        if (isSuccessCreate?.status == 'success') {
+            if(isMultipleUnit) {
+                const conversionUnitsResponse = async () => {
+                    try {
+                        const result = await AppService.serviceGet('api/conversion-unit/get-by-product', {product_id: idProduct})
+                        setConversionUnitData(result.data);
+                    } catch (error) {
+                        console.error('Error fetching data:', error);
+                    }
+                }
+                conversionUnitsResponse()
             }
+            setTimeout(() => {
+                if(!isMultipleUnit) {
+                    navigate('/page/master/products')
+                }
+            }, 3500);
         }
-    }, [isSuccessCreate, navigate]);
+    }, [isSuccessCreate]);
+
 
     return (
         <div>
@@ -183,6 +232,11 @@ const AddDataProduct = () => {
                                         value={detailProduct.name}
                                         required
                                     />
+                                    {getFormError(validationError, 'name') != null &&
+                                        <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+                                        {getFormError(validationError, 'name')}
+                                        </small>
+                                    }
                                 </CCol>
                                 <CCol md={2}>
                                     <div className="mb-3">
@@ -217,6 +271,11 @@ const AddDataProduct = () => {
                                             <option key={index} value={category.id}>{category.name}</option>
                                         ))}
                                     </CFormSelect>
+                                    {getFormError(validationError, 'category_id') != null &&
+                                        <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+                                        {getFormError(validationError, 'category_id')}
+                                        </small>
+                                    }
                                 </CCol>
                                 <CCol className='mb-3' md={6}>
                                     <CFormSelect
@@ -231,6 +290,11 @@ const AddDataProduct = () => {
                                             <option key={index} value={brand.id}>{brand.name}</option>
                                         ))}
                                     </CFormSelect>
+                                    {getFormError(validationError, 'brand_id') != null &&
+                                        <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+                                        {getFormError(validationError, 'brand_id')}
+                                        </small>
+                                    }
                                 </CCol>
                                 <CCol className='mb-3' md={6}>
                                     <CFormSelect
@@ -245,6 +309,11 @@ const AddDataProduct = () => {
                                             <option key={index} value={unit.id}>{unit.initial}</option>
                                         ))}
                                     </CFormSelect>
+                                    {getFormError(validationError, 'unit_id') != null &&
+                                        <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+                                        {getFormError(validationError, 'unit_id')}
+                                        </small>
+                                    }
                                 </CCol>
                                 <CCol className='mb-3' md={6}>
                                     <CFormInput
@@ -261,40 +330,60 @@ const AddDataProduct = () => {
                                         type='number'
                                         name="min_stock"
                                         id="min_stock"
-                                        label={'Min Stock'}
+                                        label={'Min '+ Language().LABEL_STOCK}
                                         onChange={handleInput}
                                         value={detailProduct.min_stock}
                                     />
+                                    {getFormError(validationError, 'min_stock') != null &&
+                                        <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+                                        {getFormError(validationError, 'min_stock')}
+                                        </small>
+                                    }
                                 </CCol>
                                 <CCol className='mb-3' md={6}>
                                     <CFormInput
                                         type='number'
                                         name="max_stock"
                                         id="max_stock"
-                                        label={'Max Stock'}
+                                        label={'Max '+ Language().LABEL_STOCK}
                                         onChange={handleInput}
                                         value={detailProduct.max_stock}
                                     />
+                                    {getFormError(validationError, 'max_stock') != null &&
+                                        <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+                                        {getFormError(validationError, 'max_stock')}
+                                        </small>
+                                    }
                                 </CCol>
                                 <CCol className='mb-3' md={6}>
                                     <CFormInput
                                         type='text'
                                         name="purchase_price"
                                         id="purchase_price"
-                                        label={'Purchase Price'}
-                                        onChange={handleInput}
-                                        value={detailProduct.purchase_price}
+                                        label={Language().LABEL_PURCHASE_PRICE}
+                                        value={FormaterHelper.formatRupiah(detailProduct.purchase_price.toString())}
+                                        onChange={(e) => handleInput(e)} onKeyUp={(e) => handleInput(e)} 
                                     />
+                                    {getFormError(validationError, 'purchase_price') != null &&
+                                        <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+                                        {getFormError(validationError, 'purchase_price')}
+                                        </small>
+                                    }
                                 </CCol>
                                 <CCol className='mb-3' md={6}>
                                     <CFormInput
                                         type='text'
                                         name="selling_price"
                                         id="selling_price"
-                                        label={'Selling Price'}
-                                        onChange={handleInput}
-                                        value={detailProduct.selling_price}
+                                        label={Language().LABEL_SELLING_PRICE}
+                                        value={FormaterHelper.formatRupiah(detailProduct.selling_price.toString())}
+                                        onChange={(e) => handleInput(e)} onKeyUp={(e) => handleInput(e)} 
                                     />
+                                    {getFormError(validationError, 'selling_price') != null &&
+                                        <small className='ms-1' style={{ color: 'red', display: 'block', width: '100%', fontSize: '12px' }}>
+                                        {getFormError(validationError, 'selling_price')}
+                                        </small>
+                                    }
                                 </CCol>
                                 <CCol className='mb-3' md={12}>
                                     <CFormInput
@@ -306,34 +395,52 @@ const AddDataProduct = () => {
                                         value={detailProduct.description ?? ''}
                                     />
                                 </CCol>
+
+                                <ConversionTable conversionUnitData={conversionUnitData} unitData={unitData} idProduct={idProduct} setIsMultipleUnit={setIsMultipleUnit} setIsSuccessCreate={setIsSuccessCreate}/>
+                                
                             </CRow>
                         </CCol>
+
                         <CCol md={4}>
-                            <label className='mb-2'>{Language().LABEL_IMAGE}</label>
-                            <div id='preview-img' style={{
-                                height: '300px',
-                                background: '#fafafa',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                {imagePreview ? (
-                                    <img src={`http://127.0.0.1:3001${imagePreview}`} alt="Preview" style={{
-                                        maxWidth: 'auto',
-                                        height: '97%',
-                                        objectFit: 'contain'
-                                    }} />
-                                ) : (
-                                    <p style={{ padding: '10px', color: '#acacac' }}>No image selected</p>
-                                )}
-                            </div>
-                            <CFormInput
-                                className='mt-3'
-                                type='file'
-                                name='image'
-                                accept="image/*"
-                                onChange={handleInputImage}
-                            />
+                            <CRow>
+                                <CCol md={12}>
+                                    <label className='mb-2'>{Language().LABEL_IMAGE}</label>
+                                    <div id='preview-img' style={{
+                                        height: '300px',
+                                        background: '#fafafa',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }}>
+                                        {imagePreview ? (
+                                            <img src={`http://127.0.0.1:3001${imagePreview}`} alt="Preview" style={{
+                                                maxWidth: 'auto',
+                                                height: '97%',
+                                                objectFit: 'contain'
+                                            }} />
+                                        ) : (
+                                            <p style={{ padding: '10px', color: '#acacac' }}>No image selected</p>
+                                        )}
+                                    </div>
+                                    <CFormInput
+                                        className='mt-3'
+                                        type='file'
+                                        name='image'
+                                        accept="image/*"
+                                        onChange={handleInputImage}
+                                    />
+                                </CCol>
+
+                                <CCol md={5}>
+                                    <label className='mb-2 mt-4 pt-3'>{Language().lang == 'id' ? 'Tambah Multi Satuan' : 'Add Multiple Unit'}</label>
+                                </CCol>
+                                <CCol md={5} className='pt-2'>
+                                    <CFormSelect name='multiple_unit' className='mb-2 mt-4' value={isMultipleUnit ? 'Y' : 'N'} onChange={handleMultiUnit} disabled={isMultipleUnit == 'Y'}>
+                                        <option value={'Y'}> {Language().lang == 'id' ? 'Ya' : 'Yes'} </option>
+                                        <option value={'N'}> {Language().lang == 'id' ? 'Tidak' : 'No'} </option>
+                                    </CFormSelect>
+                                </CCol>
+                            </CRow>
                         </CCol>
                     </CRow>
 

@@ -127,7 +127,7 @@ const Index = () => {
                             categoryData != null &&
                             categoryData.map((category, index) => (
                                 <CTableRow key={category.id}>
-                                    <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
+                                    <CTableDataCell>{index+1}</CTableDataCell>
                                     <CTableDataCell>{category.name}</CTableDataCell>
                                     <CTableDataCell>{category.description}</CTableDataCell>
                                     {/* <CTableDataCell style={{textAlign:'center'}}>

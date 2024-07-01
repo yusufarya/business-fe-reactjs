@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = 'http://127.0.0.1:3001/';
+const BASE_URL = process.env.BASE_URL
 
 const serviceGet = async (path, params = {}, navigate) => {
     const headers = { 
@@ -40,7 +40,8 @@ const ServicePost = async (path, params = {}, navigate) => {
     .post(BASE_URL + path, params, { headers })
     .then((response) => {
         console.log("============= RESPONSE SUCCESS =============");
-        return {statusCode: response.status, message: response.data};
+        const res = response.data
+        return {statusCode: response.status, message: res.message, data: res.data};
     })
     .catch((error) => {
         console.log("============= RESPONSE ERROR =============");
@@ -91,7 +92,8 @@ const ServicePatch = async (path, params = {}, navigate) => {
     .patch(BASE_URL + path, params, { headers })
     .then((response) => {
         console.log("============= RESPONSE SUCCESS =============");
-        return {statusCode: response.status, message: response.data};
+        const res = response.data
+        return {statusCode: response.status, message: res.message, data: res.data};
     })
     .catch((error) => {
         console.log("============= RESPONSE ERROR =============");

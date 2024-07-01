@@ -74,7 +74,7 @@ const AppHeader = ({userData}) => {
   }
 
   return (
-    <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
+    <CHeader position="sticky" className="mb-4 p-0 custom-topbar" ref={headerRef}>
       <CContainer className="border-bottom px-4" fluid>
         <CHeaderToggler
           onClick={() => dispatch(setSidebarShow(!sidebarShow))}

@@ -26,7 +26,7 @@ const AppSidebar = () => {
 	
 	return (
 		<CSidebar
-			className="border-end"
+			className="custom-sidebar"
 			colorScheme="light"
 			position="fixed"
 			unfoldable={unfoldable}
@@ -38,7 +38,7 @@ const AppSidebar = () => {
 			<CSidebarHeader className="border-bottom">
 				<CSidebarBrand to="/" style={{ textDecoration: 'none' }}>
 				{/* <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} /> */}
-				<div className="mx-4" style={{ fontSize: '28px' }}>
+				<div className="mx-4 brand-name">
 					<strong>P O S</strong> <sup>29erp</sup>
 				</div>
 				<CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />

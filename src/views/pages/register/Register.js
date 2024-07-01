@@ -18,6 +18,8 @@ import { cilLockLocked, cilPhone, cilUser } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
 import { isEmpty } from 'lodash'
 
+const BASE_URL = process.env.BASE_URL
+
 const Register = () => {
 	const navigate = useNavigate()
 	
@@ -26,8 +28,6 @@ const Register = () => {
 	const [validationError, setValidationError] = useState([])
 	const [errorPasswordVerify, setErrorPasswordVerify] = useState('')
 	const [isSamePassword, setIsSamePassword] = useState(false)
-	
-	const BASE_URL = 'http://127.0.0.1:3001/'
 	
 	const handleSubmit = async (event) => {
 		event.preventDefault()

@@ -83,7 +83,7 @@ const _nav = [
   
   {
     component: CNavGroup,
-    name: Language().lang == 'id' ? 'Transaksi Pembelian' : 'Purchase Transactions',
+    name: Language().lang == 'id' ? 'Transaksi Pembelian' : 'Purchase Transaction',
     to: '/base',
     icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
     items: [
@@ -97,7 +97,7 @@ const _nav = [
   
   {
     component: CNavGroup,
-    name: Language().lang == 'id' ? 'Transaksi Penjualan' : 'Sales Transactions',
+    name: Language().lang == 'id' ? 'Transaksi Penjualan' : 'Sales Transaction',
     to: '/base',
     icon: <CIcon icon={cilChart} customClassName="nav-icon" />,
     items: [

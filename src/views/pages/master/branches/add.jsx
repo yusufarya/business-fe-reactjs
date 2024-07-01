@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormTextarea, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CRow } from '@coreui/react';
 import AppService from '../../../../services/AppService';
 import Language from '../../../../utils/language';
+import { useSelector } from 'react-redux';
 
 const ModalAddData = ({ status, onModalStatusChange, successUpdate}) => {
+    const dataUser = useSelector((state) => state.dataUser);
+
     const [visible, setVisible] = useState(false);
     const [branchDataAdd, setBranchDataAdd] = useState(null);
 
@@ -32,16 +35,17 @@ const ModalAddData = ({ status, onModalStatusChange, successUpdate}) => {
         const branchData = {
             ...branchDataAdd, 
             is_active: is_active,
-            username: localStorage.getItem('username')
+            username: dataUser.username
         }
 
         try {
 			const response = await AppService.ServicePost('api/branch/create', branchData)
 			console.log(response)
 			if(response.statusCode == 200) {
-				successUpdate({'status':'success', 'message': response.message.data})
+				successUpdate({'status':'success', 'message': response.message})
 			} else {
-				successUpdate({'status':'failed', 'message': response.errorData.errors})
+                successUpdate({'status':'failed', 'message': 'Please check the form input.'})
+				// successUpdate({'status':'failed', 'message': response.errorData.errors})
 			}
 			handleClose()
 		} catch (error) {

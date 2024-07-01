@@ -110,7 +110,9 @@ const Index = () => {
                     <CTable hover bordered>
                         <CTableHead>
                             <CTableRow>
-                                <CTableHeaderCell style={{width: '14%'}}>No.</CTableHeaderCell>
+                                <CTableHeaderCell style={{width: '14%'}}>
+                                {Language().lang == 'id' ? 'Nomor' : 'Number'}
+                                </CTableHeaderCell>
                                 <CTableHeaderCell scope="col">
                                     {Language().LABEL_DATE}
                                 </CTableHeaderCell>

@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { CButton, CCol, CForm, CFormCheck, CFormInput, CFormLabel, CFormSelect, CFormTextarea, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react';
 import AppService from '../../../../services/AppService';
 import Language from '../../../../utils/language';
+import { useSelector } from 'react-redux';
 
 const ModalEditData = ({ status, onModalStatusChange, warehouseId, successUpdate }) => {
+	const dataUser = useSelector((state) => state.dataUser);
+
 	const [visible, setVisible] = useState(false);
 	const [fixDataWarehouse, setFixDataWarehouse] = useState(null)
 	const [warehouseDetail, setWarehouseDetail] = useState(null)
@@ -59,7 +62,7 @@ const ModalEditData = ({ status, onModalStatusChange, warehouseId, successUpdate
             address: address,
             description: description,
             is_active: is_active,
-			username: localStorage.getItem('username')
+			username: dataUser.username
         }
         // console.log(warehouseData)
 
@@ -67,9 +70,10 @@ const ModalEditData = ({ status, onModalStatusChange, warehouseId, successUpdate
 			const response = await AppService.ServicePatch('api/warehouse/update', warehouseData)
 			console.log(response)
 			if(response.statusCode == 200) {
-				successUpdate({'status':'success', 'message': response.message.data})
+				successUpdate({'status':'success', 'message': response.message})
 			} else {
-				successUpdate({'status':'failed', 'message': response.errorData.errors})
+                successUpdate({'status':'failed', 'message': 'Please check the form input.'})
+				// successUpdate({'status':'failed', 'message': response.errorData.errors})
 			}
 			handleClose()
 		} catch (error) {

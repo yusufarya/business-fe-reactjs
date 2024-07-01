@@ -22,7 +22,9 @@ import {
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
-const avatar = 'http://127.0.0.1:3001/src/public/images/profile/user_default.png';
+const BASE_URL = process.env.BASE_URL
+
+const avatar = BASE_URL+'src/public/images/profile/user_default.png';
 
 const AppHeaderDropdown = () => {
   return (

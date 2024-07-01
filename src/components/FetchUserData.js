@@ -29,8 +29,13 @@ const FetchUserData = ({ setIsPageDisabled, isLoggedIn }) => {
             const loginStatus = { status: 'success', message: "OK" };
             dispatch(setIsLoggedIn(loginStatus)); // Dispatch the action
             dispatch(setUserData(user.data)); // Dispatch the action to set user data
+        } else if(user.statusCode == null) {
+          setIsPageDisabled(true);
+          dispatch(setIsLoggedIn({ status: 'failed', message: 'Server Error' }))
         }
       } catch (error) {
+        setIsPageDisabled(true);
+        dispatch(setIsLoggedIn({ status: 'failed', message: 'Server Error' }))
         console.error('Error fetching user data:', error);
       }
     };

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import axios from 'axios'; // Import Axios library
 import { Link, useNavigate } from 'react-router-dom';
@@ -19,6 +20,8 @@ import CIcon from '@coreui/icons-react';
 import { cilLockLocked, cilUser } from '@coreui/icons';
 import { setIsLoggedIn } from '../../../redux/actions/loginActions'; // Import the action
 
+const BASE_URL = process.env.BASE_URL
+
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,8 +32,6 @@ const Login = () => {
   const [flashSuccess, setFlashSuccess] = useState('');
   const [flashError, setFlashError] = useState('');
   const [validationError, setValidationError] = useState([]);
-
-  const BASE_URL = 'http://127.0.0.1:3001/';
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -90,7 +91,7 @@ const Login = () => {
         dispatch(setIsLoggedIn(loginStatus)); // Dispatch the action
         setFlashSuccess("Login successfully.");
         setTimeout(() => {
-			navigate('/');
+          navigate('/');
         }, 3500);
       } catch (error) {
         setFlashError(error.response.data.errors);
