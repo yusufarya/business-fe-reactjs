@@ -26,6 +26,7 @@ const AddDataProduct = () => {
     const [validationError, setValidationError] = useState([])
     const [barcode, setBarcode] = useState('');
     const [isMultipleUnit, setIsMultipleUnit] = useState(false)
+    const [isMultipleUnitDefault, setIsMultipleUnitDefault] = useState(false)
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -46,7 +47,7 @@ const AddDataProduct = () => {
                 setBrandData(brandResponse.data);
                 setUnitData(unitResponse.data);
                 if(conversionUnitsResponse.data.length > 0) {
-                    setIsMultipleUnit('Y')
+                    setIsMultipleUnitDefault('Y')
                 }
                 setConversionUnitData(conversionUnitsResponse.data);
             } catch (error) {
@@ -203,7 +204,7 @@ const AddDataProduct = () => {
                 if(!isMultipleUnit) {
                     navigate('/page/master/products')
                 }
-            }, 3500);
+            }, 3000);
         }
     }, [isSuccessCreate]);
 
@@ -435,7 +436,7 @@ const AddDataProduct = () => {
                                     <label className='mb-2 mt-4 pt-3'>{Language().lang == 'id' ? 'Tambah Multi Satuan' : 'Add Multiple Unit'}</label>
                                 </CCol>
                                 <CCol md={5} className='pt-2'>
-                                    <CFormSelect name='multiple_unit' className='mb-2 mt-4' value={isMultipleUnit ? 'Y' : 'N'} onChange={handleMultiUnit} disabled={isMultipleUnit == 'Y'}>
+                                    <CFormSelect name='multiple_unit' className='mb-2 mt-4' value={isMultipleUnitDefault ? 'Y' : 'N'} onChange={handleMultiUnit} disabled={isMultipleUnitDefault == 'Y'}>
                                         <option value={'Y'}> {Language().lang == 'id' ? 'Ya' : 'Yes'} </option>
                                         <option value={'N'}> {Language().lang == 'id' ? 'Tidak' : 'No'} </option>
                                     </CFormSelect>

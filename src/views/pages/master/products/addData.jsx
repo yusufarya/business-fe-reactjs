@@ -222,7 +222,7 @@ const AddDataProduct = () => {
                 if(!isMultipleUnit) {
                     navigate('/page/master/products')
                 }
-            }, 3500);
+            }, 3000);
         } else {
             setIsMultipleUnit(false)
         }

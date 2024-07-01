@@ -5,6 +5,7 @@ import CIcon from "@coreui/icons-react";
 import Language from '../../../../../utils/language';
 import AppService from '../../../../../services/AppService';
 import { useSelector } from 'react-redux';
+import ModalDeleteConversion from './ModalDeleteConversion';
 
 const ConversionTable = ({ conversionUnitData, unitData, idProduct, setIsMultipleUnit, setIsSuccessCreate }) => {
     const dataUser = useSelector((state) => state.dataUser);
@@ -85,138 +86,164 @@ const ConversionTable = ({ conversionUnitData, unitData, idProduct, setIsMultipl
         }
     }
 
+    const [visible, setVisible] = useState(false)
+    const [rowData, setRowData] = useState(null)
+    const [action, setAction] = useState(null)
+    const [isSuccessDelete, setIsSuccessDelete] = useState(null)
+
+    const handleDeleteClick = (conversionId, unitName) => {
+        setVisible(!visible)
+        setRowData({id:conversionId, name:unitName})
+        setAction('delete')
+    }
+    
+    const handleModalStatusChange = (visible) => {
+        setVisible(visible);
+    };
+
+    const successDelete = (response) => {
+        setIsSuccessDelete(response)
+        setIsSuccessCreate(response)
+    }
+
     return (
         conversionUnitData.length > 0 && (
-            <CCol md={12}>
-                <CRow className='pb-1'>
-                    <CCol>
-                        <strong>Multi Satuan</strong>
-                    </CCol>
-                    <CCol>
-                        <CButton style={{ float: 'right' }} size='sm' color='primary' onClick={handleAddConversion}>
-                            <b>+</b> {Language().LABEL_UNIT}
-                        </CButton>
-                    </CCol>
-                </CRow>
-                <CTable bordered>
-                    <CTableHead>
-                        <CTableRow>
-                            <CTableHeaderCell style={{ width: '7%' }}>No.</CTableHeaderCell>
-                            <CTableHeaderCell style={{ width: '13%' }}>{Language().LABEL_UNIT}</CTableHeaderCell>
-                            <CTableHeaderCell style={{ width: '13%' }}>{Language().LABEL_QTY}</CTableHeaderCell>
-                            <CTableHeaderCell scope="col">{Language().LABEL_PURCHASE_PRICE}</CTableHeaderCell>
-                            <CTableHeaderCell scope="col">{Language().LABEL_SELLING_PRICE}</CTableHeaderCell>
-                            <CTableHeaderCell style={{ width: '14%', textAlign: 'center' }}>{Language().LABEL_ACTION}</CTableHeaderCell>
-                        </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
-                        {conversionUnitData.map((conversion, index) => (
-                            <CTableRow key={index}>
-                                <CTableDataCell>{index + 1}.</CTableDataCell>
-                                <CTableDataCell>
-                                    {editingIndex === index ? (
-                                        <CFormSelect name="conversion_unit" value={formData.conversion_unit} onChange={handleInputChangeEdit}>
+            <div>
+                <CCol md={12}>
+                    <CRow className='pb-1'>
+                        <CCol>
+                            <strong>Multi Satuan</strong>
+                        </CCol>
+                        <CCol>
+                            <CButton style={{ float: 'right' }} size='sm' color='primary' onClick={handleAddConversion}>
+                                <b>+</b> {Language().LABEL_UNIT}
+                            </CButton>
+                        </CCol>
+                    </CRow>
+                    <CTable bordered>
+                        <CTableHead>
+                            <CTableRow>
+                                <CTableHeaderCell style={{ width: '7%' }}>No.</CTableHeaderCell>
+                                <CTableHeaderCell style={{ width: '13%' }}>{Language().LABEL_UNIT}</CTableHeaderCell>
+                                <CTableHeaderCell style={{ width: '13%' }}>{Language().LABEL_QTY}</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">{Language().LABEL_PURCHASE_PRICE}</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">{Language().LABEL_SELLING_PRICE}</CTableHeaderCell>
+                                <CTableHeaderCell style={{ width: '14%', textAlign: 'center' }}>{Language().LABEL_ACTION}</CTableHeaderCell>
+                            </CTableRow>
+                        </CTableHead>
+                        <CTableBody>
+                            {conversionUnitData.map((conversion, index) => (
+                                <CTableRow key={index}>
+                                    <CTableDataCell>{index + 1}.</CTableDataCell>
+                                    <CTableDataCell>
+                                        {editingIndex === index ? (
+                                            <CFormSelect name="conversion_unit" value={formData.conversion_unit} onChange={handleInputChangeEdit}>
+                                                <option value="">Select</option>
+                                                {unitData && unitData.map((item, i) => (
+                                                    <option value={item.initial} key={i}>{item.initial}</option>
+                                                ))}
+                                            </CFormSelect>
+                                        ) : (
+                                            conversion.conversion_unit
+                                        )}
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        {editingIndex === index ? (
+                                            <CFormInput
+                                                type="text"
+                                                name="qty"
+                                                value={formData.qty}
+                                                onChange={handleInputChangeEdit}
+                                            />
+                                        ) : (
+                                            conversion.qty
+                                        )}
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        {editingIndex === index ? (
+                                            <CFormInput
+                                                type="text"
+                                                name="purchase_price"
+                                                value={formData.purchase_price}
+                                                onChange={handleInputChangeEdit}
+                                            />
+                                        ) : (
+                                            conversion.purchase_price
+                                        )}
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        {editingIndex === index ? (
+                                            <CFormInput
+                                                type="text"
+                                                name="selling_price"
+                                                value={formData.selling_price}
+                                                onChange={handleInputChangeEdit}
+                                            />
+                                        ) : (
+                                            conversion.selling_price
+                                        )}
+                                    </CTableDataCell>
+                                    <CTableDataCell style={{ textAlign: 'center' }}>
+                                        {index + 1 > 1 && (
+                                            <>
+                                                {editingIndex === index ? (
+                                                    <CButton color="success" size="sm" onClick={() => handleSaveClick(index)}>
+                                                        Save
+                                                    </CButton>
+                                                ) : (
+                                                    <>
+                                                        <CButton color="warning" size="sm" onClick={() => handleEditClick(index, conversion)}>
+                                                            <CIcon style={{ color: 'azure' }} icon={cilPencil} />
+                                                        </CButton>
+                                                        &nbsp;&nbsp;
+                                                        <CButton color="danger" size="sm" onClick={() => handleDeleteClick(conversion.id, conversion.unit)}>
+                                                            <CIcon style={{ color: 'white' }} icon={cilTrash} />
+                                                        </CButton>
+                                                    </>
+                                                )}
+                                            </>
+                                        )}
+                                    </CTableDataCell>
+                                </CTableRow>
+                            ))}
+                            {addRowConversion && (
+                                <CTableRow key={conversionUnitData.length}>
+                                    <CTableDataCell>{conversionUnitData.length + 1}.</CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormSelect name="conversion_unit" defaultValue={''} onChange={handleInputChangeAdd}>
                                             <option value="">Select</option>
                                             {unitData && unitData.map((item, i) => (
                                                 <option value={item.initial} key={i}>{item.initial}</option>
                                             ))}
                                         </CFormSelect>
-                                    ) : (
-                                        conversion.conversion_unit
-                                    )}
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    {editingIndex === index ? (
-                                        <CFormInput
-                                            type="text"
-                                            name="qty"
-                                            value={formData.qty}
-                                            onChange={handleInputChangeEdit}
-                                        />
-                                    ) : (
-                                        conversion.qty
-                                    )}
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    {editingIndex === index ? (
-                                        <CFormInput
-                                            type="text"
-                                            name="purchase_price"
-                                            value={formData.purchase_price}
-                                            onChange={handleInputChangeEdit}
-                                        />
-                                    ) : (
-                                        conversion.purchase_price
-                                    )}
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    {editingIndex === index ? (
-                                        <CFormInput
-                                            type="text"
-                                            name="selling_price"
-                                            value={formData.selling_price}
-                                            onChange={handleInputChangeEdit}
-                                        />
-                                    ) : (
-                                        conversion.selling_price
-                                    )}
-                                </CTableDataCell>
-                                <CTableDataCell style={{ textAlign: 'center' }}>
-                                    {index + 1 > 1 && (
-                                        <>
-                                            {editingIndex === index ? (
-                                                <CButton color="success" size="sm" onClick={() => handleSaveClick(index)}>
-                                                    Save
-                                                </CButton>
-                                            ) : (
-                                                <>
-                                                    <CButton color="warning" size="sm" onClick={() => handleEditClick(index, conversion)}>
-                                                        <CIcon style={{ color: 'azure' }} icon={cilPencil} />
-                                                    </CButton>
-                                                    &nbsp;&nbsp;
-                                                    <CButton color="danger" size="sm" onClick={() => handleDeleteClick(conversion.id, conversion.unit)}>
-                                                        <CIcon style={{ color: 'white' }} icon={cilTrash} />
-                                                    </CButton>
-                                                </>
-                                            )}
-                                        </>
-                                    )}
-                                </CTableDataCell>
-                            </CTableRow>
-                        ))}
-                        {addRowConversion && (
-                            <CTableRow key={conversionUnitData.length}>
-                                <CTableDataCell>{conversionUnitData.length + 1}.</CTableDataCell>
-                                <CTableDataCell>
-                                    <CFormSelect name="conversion_unit" defaultValue={''} onChange={handleInputChangeAdd}>
-                                        <option value="">Select</option>
-                                        {unitData && unitData.map((item, i) => (
-                                            <option value={item.initial} key={i}>{item.initial}</option>
-                                        ))}
-                                    </CFormSelect>
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    <CFormInput type="text" name="qty" defaultValue={0} onChange={handleInputChangeAdd} />
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    <CFormInput type="text" name="purchase_price" defaultValue={0} onChange={handleInputChangeAdd} />
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    <CFormInput type="text" name="selling_price" defaultValue={0} onChange={handleInputChangeAdd} />
-                                </CTableDataCell>
-                                <CTableDataCell style={{ textAlign: 'center' }}>
-                                    <CButton type='button' color="success" size="sm" onClick={handleBtnAddConversion}>
-                                        <CIcon style={{ color: 'azure' }} icon={cilPlus} />
-                                    </CButton>
-                                    <CButton type='button' color="danger" size="sm">
-                                        <CIcon style={{ color: 'azure' }} icon={cilX} />
-                                    </CButton>
-                                </CTableDataCell>
-                            </CTableRow>
-                        )}
-                    </CTableBody>
-                </CTable>
-            </CCol>
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput type="text" name="qty" defaultValue={0} onChange={handleInputChangeAdd} />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput type="text" name="purchase_price" defaultValue={0} onChange={handleInputChangeAdd} />
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        <CFormInput type="text" name="selling_price" defaultValue={0} onChange={handleInputChangeAdd} />
+                                    </CTableDataCell>
+                                    <CTableDataCell style={{ textAlign: 'center' }}>
+                                        <CButton type='button' color="success" size="sm" onClick={handleBtnAddConversion}>
+                                            <CIcon style={{ color: 'azure' }} icon={cilPlus} />
+                                        </CButton>
+                                        <CButton type='button' color="danger" size="sm">
+                                            <CIcon style={{ color: 'azure' }} icon={cilX} />
+                                        </CButton>
+                                    </CTableDataCell>
+                                </CTableRow>
+                            )}
+                        </CTableBody>
+                    </CTable>
+                </CCol>
+
+                {action == 'delete' &&
+                    (visible && <ModalDeleteConversion status={visible} onModalStatusChange={handleModalStatusChange} params={rowData} successDeleted={successDelete} />)
+                }
+            </div>
         )
     );
 };
