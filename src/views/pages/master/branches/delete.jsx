@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CButton, CForm, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react';
 import AppService from '../../../../services/AppService';
+import Language from '../../../../utils/language';
 
 const ModalDelete = ({status, onModalStatusChange, paramsBranch, successUpdate}) => {
     console.log(paramsBranch)
@@ -18,7 +19,7 @@ const ModalDelete = ({status, onModalStatusChange, paramsBranch, successUpdate})
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        
+
         try {
             const response = await AppService.serviceDelete('api/branch/delete', {id:paramsBranch.id})
             console.log(response)
@@ -40,20 +41,20 @@ const ModalDelete = ({status, onModalStatusChange, paramsBranch, successUpdate})
                 onClose={handleClose}
                 aria-labelledby="LiveDemoExampleLabel"
             >
-            <CModalHeader onClose={handleClose}>
-				<CModalTitle id="LiveDemoExampleLabel">Delete Data Branch</CModalTitle>
-			</CModalHeader>
-            <CForm onSubmit={handleSubmit}>
+              <CModalHeader onClose={handleClose}>
+                <CModalTitle id="LiveDemoExampleLabel">{Language().LABEL_DELETE} {Language().LABEL_BRANCH}</CModalTitle>
+              </CModalHeader>
+              <CForm onSubmit={handleSubmit}>
                 <CModalBody>
                     Delete data {paramsBranch.name} ?
                 </CModalBody>
-				<CModalFooter>
-					<CButton color="secondary" onClick={handleClose}>
-						Cancel
-					</CButton>
-					<CButton type='submit' color="primary">Yes</CButton>
-				</CModalFooter>
-            </CForm>
+                <CModalFooter>
+                  <CButton color="secondary" onClick={handleClose}>
+                    Cancel
+                  </CButton>
+                  <CButton type='submit' color="primary">Yes</CButton>
+                </CModalFooter>
+              </CForm>
             </CModal>
         </>
     )

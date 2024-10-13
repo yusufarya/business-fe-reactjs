@@ -10,7 +10,7 @@ const ModalEditData = ({ status, onModalStatusChange, branchId, successUpdate })
 	const [visible, setVisible] = useState(false);
 	const [fixDataBranch, setFixDataBranch] = useState(null)
 	const [branchDetail, setBranchDetail] = useState(null)
-	
+
 	useEffect(() => {
 		setVisible(status);
 		const getDetailBranch = async () => {
@@ -32,7 +32,7 @@ const ModalEditData = ({ status, onModalStatusChange, branchId, successUpdate })
 	};
 
 	function handleInput(e) {
-        setBranchDetail({...branchDetail, [e.target.name]: e.target.value} ) 
+        setBranchDetail({...branchDetail, [e.target.name]: e.target.value} )
     }
 
 	const handleSubmit = async (event) => {
@@ -78,7 +78,7 @@ const ModalEditData = ({ status, onModalStatusChange, branchId, successUpdate })
 			aria-labelledby="LiveDemoExampleLabel"
 		>
 			<CModalHeader onClose={handleClose}>
-				<CModalTitle id="LiveDemoExampleLabel">Edit Data Branch</CModalTitle>
+        <CModalTitle id="LiveDemoExampleLabel">{Language().LABEL_EDIT} {Language().LABEL_BRANCH}</CModalTitle>
 			</CModalHeader>
 			<CForm onSubmit={handleSubmit}>
 				<CModalBody>
@@ -113,7 +113,7 @@ const ModalEditData = ({ status, onModalStatusChange, branchId, successUpdate })
 					</CButton>
 					<CButton type='submit' color="primary">Save changes</CButton>
 				</CModalFooter>
-				
+
 			</CForm>
 		</CModal>
 		</>
